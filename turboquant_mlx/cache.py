@@ -11,6 +11,7 @@ from turboquant_mlx.rotation import random_diagonal_sign
 from turboquant_mlx.packing import pack_indices, unpack_indices, packed_dim, VALS_PER_WORD
 from turboquant_mlx.metal import fused_quantize, dequant_fp16
 from turboquant_mlx.kernels import packed_dequantize
+from mlx_lm.models.cache import create_attention_mask
 
 
 def _compute_gaussian_codebook(bits):
@@ -226,9 +227,8 @@ class TurboQuantKVCache:
     def size(self):
         return self.offset
 
-    def make_mask(self, *args, **kwargs):
-        # create_attention_mask not available in standalone mode
-        return create_attention_mask(*args, offset=self.offset, **kwargs)
+    def make_mask(self, N, return_array=False, window_size=None):
+        return create_attention_mask(N, offset=self.offset, return_array=return_array, window_size=window_size)
 
     @classmethod
     def from_state(cls, state, meta_state):

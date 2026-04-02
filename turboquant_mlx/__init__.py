@@ -8,5 +8,7 @@ from turboquant_mlx.rotation import (
     inverse_randomized_hadamard,
     random_diagonal_sign,
 )
+from turboquant_mlx.adaptive import make_adaptive_cache
+from turboquant_mlx.patch import apply_patch, remove_patch
 
 __version__ = "0.2.0"

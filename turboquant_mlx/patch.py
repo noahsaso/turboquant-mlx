@@ -14,14 +14,12 @@ _patched = False
 def _patched_sdpa(queries, keys, values, cache, scale, mask, sinks=None):
     """Patched SDPA that uses fused kernel for TurboQuant decode."""
     from turboquant_mlx.cache import TurboQuantKVCache
-    from turboquant_mlx.fused_attention import turboquant_attention
 
-    # Use fused path only for decode (single query token) with our cache
     is_decode = queries.shape[2] == 1
-    is_tq = isinstance(cache, TurboQuantKVCache) and cache.offset > 0 and cache.fused
+    is_tq = isinstance(cache, TurboQuantKVCache) and cache.offset > 0 and getattr(cache, "fused", False)
 
     if is_decode and is_tq:
-        # Pass V from arguments (decode buffer) to avoid re-dequanting
+        from turboquant_mlx.fused_attention import turboquant_attention
         return turboquant_attention(queries, cache, scale, mask, v_buffer=values)
     elif hasattr(cache, "bits"):
         # Original quantized path

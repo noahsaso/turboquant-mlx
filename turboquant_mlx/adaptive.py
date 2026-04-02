@@ -50,7 +50,5 @@ def make_adaptive_cache(
         if i < fp16_layers or i >= num_layers - fp16_layers:
             caches.append(KVCache())
         else:
-            caches.append(TurboQuantKVCache(
-                bits=bits, k_bits=k_bits, v_bits=v_bits,
-                seed=seed, fused=fused))
+            caches.append(TurboQuantKVCache(bits=k_bits or bits, seed=seed))
     return caches
